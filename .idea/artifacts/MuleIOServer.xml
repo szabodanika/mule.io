@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MuleIOServer">
+    <output-path>$PROJECT_DIR$/out/artifacts/MuleIOServer</output-path>
+    <root id="archive" name="mule.io.jar">
+      <element id="module-output" name="mule.io" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/demo/server/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>

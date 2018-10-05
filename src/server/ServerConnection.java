@@ -1,20 +1,26 @@
 package server;
 
 import common.ByteUtils;
+import common.Connection;
 import common.Message;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ServerConnection extends common.Connection<Server>{
 
 
     public byte[] id = null;
+    private int sourcePort;
 
     public ServerConnection(Socket socket, Server server) throws Exception {
         this.socket = socket;
-        this.address = socket.getInetAddress().getHostName();
+        this.inetAddress = socket.getInetAddress();
+        this.sourcePort = socket.getPort();
+        this.setAddress(inetAddress.getHostAddress());
         this.node = server;
 
         out = new DataOutputStream(socket.getOutputStream());
@@ -24,12 +30,15 @@ public class ServerConnection extends common.Connection<Server>{
         listen();
     }
 
-    public void send(byte[] id, byte[] content) throws Exception {
-        Message message = new Message(node,this,id, content, null);
-        if(sending == null) {
-            sending = message;
-            sendNext();
-        } else sending.enqueueCommand(message);
+    public ServerConnection() {
+        //do not call empty constructor, use getAddressHolder() instead
+    }
+
+    public static ServerConnection getAddressHolder(String address){
+        if(address == null) return null;
+        ServerConnection serverConnection = new ServerConnection();
+        serverConnection.setAddress(address);
+        return serverConnection;
     }
 
     public void sendNext() throws Exception {
@@ -50,18 +59,47 @@ public class ServerConnection extends common.Connection<Server>{
 
         switch (ByteUtils.checkSum(received.getID())){
             case 0:
+                if(handshakedone) break;
                 aes.setKey(received.getContent());
                 break;
             case 1:
+                if(handshakedone) break;
                 aes.setIv(new IvParameterSpec(received.getContent()));
                 handshakeDone();
                 break;
             case 2:
-                id = received.getContent();
-                node.onIntroduction(this);
+                if(this.id != null) break;
+                if(node.isIDInUse(new String(received.getContent()))){
+                    send("error".getBytes(), "Someone has already connected with that ID.".getBytes());
+                    close();
+                    break;
+                }
+
+                Pattern allowedCharacters = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = allowedCharacters.matcher(new String(received.getContent()));
+                if(!matcher.find()){
+                    id = received.getContent();
+                    if(!node.getFirewall().verifyConnection(new String(id))){
+                        this.close();
+                    }
+                    node.onIntroduction(this);
+                } else {
+                    send("error".getBytes(), "Special character in ID.".getBytes());
+                    close();
+                }
                 break;
             default:
-                node.onReceived(this,received.getID(),received.getContent());
+                if(this.id == null) break;
+                if (received.isRequest()) {
+                    node.onRequested(this, received.getRequestId(), received.getID(), received.getContent());
+                }
+                if (received.isResult()) {
+                    if (requested == null) requested = received.withoutNext();
+                    else requested.enqueueMessage(received.withoutNext());
+                    requested.notifyAll();
+                }
+                node.onReceived(this, received.getID(), received.getContent());
+
         }
 
         received = received.getNext();
@@ -73,18 +111,14 @@ public class ServerConnection extends common.Connection<Server>{
     }
 
     @Override
-    public void interpret(byte[] id, byte[] content) throws Exception {
-        Message message = new Message(node,this, id, content, null);
-        if(received == null) {
-            received = message;
-            interpretNext();
-        } else received.enqueueCommand(message);
+    protected boolean verifyMessage(Connection<Server> connection) {
+        return node.getFirewall().verifyMessage(connection);
     }
 
 
     public void handshakeDone() {
         this.handshakedone = true;
-        node.connections.add(this);
+        node.getConnections().add(this);
         node.onConnected(this);
     }
 
@@ -92,15 +126,7 @@ public class ServerConnection extends common.Connection<Server>{
         return id;
     }
 
-    public void setId(byte[] id) {
-        this.id = id;
-    }
-
-    public Server getServer() {
-        return node;
-    }
-
-    public void setServer(Server server) {
-        this.node = server;
+    public int getSourcePort() {
+        return sourcePort;
     }
 }

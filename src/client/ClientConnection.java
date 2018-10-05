@@ -1,6 +1,7 @@
 package client;
 
 import common.ByteUtils;
+import common.Connection;
 import common.Message;
 import common.RSA;
 import java.io.DataInputStream;
@@ -13,25 +14,17 @@ public class ClientConnection extends common.Connection<Client> {
     public ClientConnection(Socket socket, Client client) throws Exception {
         this.node = client;
         this.socket = socket;
-        this.address = socket.getInetAddress().getHostName();
+        if(socket!=null) this.inetAddress = socket.getInetAddress();
 
         out = new DataOutputStream(socket.getOutputStream());
         in = new DataInputStream(socket.getInputStream());
 
         listen();
-        sendAES();
-        sendID();
     }
 
-    @Override
-    public void send(byte[] id, byte[] content) throws Exception {
-        Message message = new Message(node,this, id, content, null);
-        if(sending == null) {
-            sending = message;
-            sendNext();
-        } else sending.enqueueCommand(message);
-    }
+    public ClientConnection(){
 
+    }
     @Override
     public void sendNext() throws Exception {
 
@@ -54,7 +47,10 @@ public class ClientConnection extends common.Connection<Client> {
 
         switch (ByteUtils.checkSum(received.getID())){
             case 0:
+                if(handshakedone) break;
                 node.getRsa().setPublicKey(RSA.bytesToPublicKey(received.getContent()));
+                sendAES();
+                sendID();
                 break;
             default:
                 node.onReceived(this,received.getID(),received.getContent());
@@ -76,16 +72,12 @@ public class ClientConnection extends common.Connection<Client> {
     }
 
     @Override
-    public void interpret(byte[] id, byte[] content) throws Exception {
-        Message message = new Message(node,this, id, content, null);
-        if(received == null) {
-            received = message;
-            interpretNext();
-        } else received.enqueueCommand(message);
+    protected boolean verifyMessage(Connection<Client> connection) {
+        return true;
     }
 
 
-    public void handshakeDone() throws Exception {
+    public void handshakeDone() {
         node.onConnected(this);
         this.handshakedone = true;
     }

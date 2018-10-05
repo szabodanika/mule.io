@@ -32,8 +32,8 @@ public class ByteUtils {
         System.out.println("MESSAGE CONTENT LENGTH: " + message.getContent().length);
         System.out.println("MESSAGE ID SUM: " + ByteUtils.checkSum(message.getID()));
         System.out.println("MESSAGE CONTENT SUM: " + ByteUtils.checkSum(message.getContent()));
-        print("MESSAGE ID", message.getID());
-        print("MESSAGE CONTENT", message.getContent());
+//        print("MESSAGE ID", message.getID());
+//        print("MESSAGE CONTENT", message.getContent());
     }
 
     public static boolean isZeroArray(byte[] bytes){
