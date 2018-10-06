@@ -8,6 +8,10 @@ Mule.io is a light weight event-driven socket communication framework written in
 
 Currently looking for testers and contributors
 
+### Download
+
+You can either clone the project and buid the jars for yourself, or download them from the build folder.
+
 ### Demo
 
 You can find the demo classes (Server and Client) in the Demo package, they let you try a simple messaging application built on mule.io.
