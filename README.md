@@ -16,7 +16,7 @@ You can find the demo classes (Server and Client) in the Demo package, they let 
 
 First the server will generate the config and other files, and on the second run it will start running on the port specified in the config file.
 
-```sh
+```java
 public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
     Server server = new Server() {
         //called when a connected and authorized client sends a message
@@ -121,7 +121,7 @@ public static void main(String[] args) throws IOException, NoSuchAlgorithmExcept
 ```
 
 ### Setting up the client
-```sh
+```java
 public static void main(String[] args) {
     Client client = new Client() {
         //called when the client received a message from the server after authorization
@@ -175,7 +175,7 @@ the only difference is that in the server's receiver and requester methods it ge
 the sender client.
 
 
-```sh
+```java
 public static void main(String[] args) {
 
     MyClient client = new MyClient();
