@@ -216,9 +216,9 @@ Currently looking for contributors and testers.
 
 | Version | Date |Changes |
 | ------ | ------ | ------ |
-| 1.0 | 2018. 09. 18 | Initial release |
-| 1.1 | 2018. 10. 06 | <ul><li>New firewall with ip and id blocking, muting and kicking</li><li>Added support for requests</li><li>Some configurations are now set in a file</li><li>Id's or now compulsory to connect, and they are saved in a file</li><li>No special characters in id's</li></ul> |
-
+| 1.0 | 18 September 2018 | Initial release |
+| 1.1 | 6 October 2018 | <ul><li>New firewall with ip and id blocking, muting and kicking</li><li>Added support for requests</li><li>Some configurations are now set in a file</li><li>Id's or now compulsory to connect, and they are saved in a file</li><li>No special characters in id's</li></ul> |
+| 1.1.1 | 10 October 2018 | <ul><li>Finished request timout, added timeout limit to common config</li><li>Minor additions to the demo classes</li></ul> |
 ### Contact
 
 Dániel Szabó <br/>

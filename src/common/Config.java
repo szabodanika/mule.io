@@ -11,5 +11,6 @@ public class Config {
     public static final int ARG_REQUEST_ID_LENGTH = 8;
     public static final int ARG_CHECKSUM_BYTES = 8;
     public static final int ARG_ID_LENGTH_BYTES = 4;
+    public static final int REQUEST_TIMEOUT = 250; //MILLISECONDS
 
 }

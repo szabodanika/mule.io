@@ -37,7 +37,7 @@ public class muleio_server {
             @Override
             public void onRequested(ServerConnection connection, byte[] requestId, byte[] id, byte[] content) {
                 System.out.println(getBestName(connection) + " requested " + new String(id));
-                if(new String(id).equals("inetAddress")) {
+                if(new String(id).equals("address ")) {
                     try {
                         connection.sendResult(requestId, id, getActiveConnectionByIDorAddress(new String(content)).getAddress().getBytes());
                     } catch (Exception e) { }
@@ -46,6 +46,7 @@ public class muleio_server {
 
             @Override
             public void onRequestTimeout(ServerConnection connection, byte[] id, byte[] content) {
+                System.out.println(getBestName(connection) + " did not answer the request " + new String(id) + " in time.");
 
             }
 
@@ -86,15 +87,15 @@ public class muleio_server {
                 System.out.println("/whois [id]");
                 System.out.println("/whisper [id or ip inetAddress] [message]");
                 System.out.println("/kick [id]");
-                System.out.println("/mute [id ] [time in minutes]");
-                System.out.println("/unmute [id] [time in minutes]");
-                System.out.println("/ban [id] [time in minutes]");
-                System.out.println("/unban [id]");
-                System.out.println("/kickaddress [id or ip inetAddress]");
-                System.out.println("/muteaddress [id or ip inetAddress] [time in minutes]");
-                System.out.println("/unmuteaddress [id or ip inetAddress] [time in minutes]");
-                System.out.println("/banaddress [id or ip inetAddress] [time in minutes]");
-                System.out.println("/unbanaddress [id or ip inetAddress]");
+                System.out.println("/muteuser [id ] [time in minutes]");
+                System.out.println("/unmuteuser [id] [time in minutes]");
+                System.out.println("/banuser [id] [time in minutes]");
+                System.out.println("/unbanuser [id]");
+                System.out.println("/kickaddress [id or ip address]");
+                System.out.println("/muteaddress [id or ip address] [time in minutes]");
+                System.out.println("/unmuteaddress [id or ip address] ");
+                System.out.println("/banaddress [id or ip address] [time in minutes]");
+                System.out.println("/unbanaddress [id or ip address] ");
             }
 
             @Override
@@ -305,15 +306,15 @@ public class muleio_server {
             System.out.println("/whois [id]");
             System.out.println("/whisper [id or ip inetAddress] [message]");
             System.out.println("/kick [id]");
-            System.out.println("/mute [id ] [time in minutes]");
-            System.out.println("/unmute [id] [time in minutes]");
-            System.out.println("/ban [id] [time in minutes]");
-            System.out.println("/unban [id]");
-            System.out.println("/kickaddress [id or ip inetAddress]");
-            System.out.println("/muteaddress [id or ip inetAddress] [time in minutes]");
-            System.out.println("/unmuteaddress [id or ip inetAddress] [time in minutes]");
-            System.out.println("/banaddress [id or ip inetAddress] [time in minutes]");
-            System.out.println("/unbanaddress [id or ip inetAddress]");
+            System.out.println("/muteuser [id ] [time in minutes]");
+            System.out.println("/unmuteuser [id] [time in minutes]");
+            System.out.println("/banuser [id] [time in minutes]");
+            System.out.println("/unbanuser [id]");
+            System.out.println("/kickaddress [id or ip address]");
+            System.out.println("/muteaddress [id or ip address] [time in minutes]");
+            System.out.println("/unmuteaddress [id or ip address] ");
+            System.out.println("/banaddress [id or ip address] [time in minutes]");
+            System.out.println("/unbanaddress [id or ip address] ");
 
         } else {
             System.out.println("Unrecognized command");

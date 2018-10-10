@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 public class muleio_client {
 
+    //STOPSHIP
     private static final String address = "localhost";
     private static final int port = 2929;
     private static int reconnectAttempts = 3;
@@ -37,7 +38,7 @@ public class muleio_client {
 
             @Override
             public void onRequestTimeout(ClientConnection connection, byte[] id, byte[] content) {
-
+                System.out.println("The server did not answer the request " + new String(id) + " in time.");
             }
 
             @Override
@@ -77,7 +78,7 @@ public class muleio_client {
                 System.out.println("Commands:");
                 System.out.println("/help");
                 System.out.println("/whois [id]");
-                System.out.println("/whisper [id or ip inetAddress] [message]");
+                System.out.println("/whisper [id or ip address] [message]");
             }
         };
 
@@ -116,7 +117,7 @@ public class muleio_client {
 
         } else if(msg.startsWith("/whois")){
 
-            new Thread(() -> System.out.println(new String(client.request("inetAddress", getParam(msg,1,1).getBytes())))).start();
+            new Thread(() -> System.out.println(new String(client.request("address", getParam(msg,1,1).getBytes())))).start();
 
         } else if(msg.startsWith("/help")){
 

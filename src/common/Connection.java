@@ -8,7 +8,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.sql.Time;
 import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static java.lang.Thread.sleep;
 
@@ -26,6 +29,7 @@ public abstract class Connection<T extends Node> {
     protected DataInputStream in;
     protected DataOutputStream out;
     protected boolean handshakedone = false, listen = true;
+    private Connection thisConnection = this;
 
     public void send(byte[] id, byte[] content) throws Exception {
         Message message = new Message(node,this, id, content, null);
@@ -59,19 +63,33 @@ public abstract class Connection<T extends Node> {
         final byte[] requestId = ByteUtils.generateRandom(Config.ARG_REQUEST_ID_LENGTH);
 
         try {
+
             sendRequest(requestId, id, content);
-            while(true){
+            final boolean[] wait = {true};
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if(wait[0] == true){
+                        wait[0] = false;
+                        node.onRequestTimeout(thisConnection, id, content);
+                    }
+                }
+            }, Config.REQUEST_TIMEOUT);
+
+            while(wait[0]){
                 sleep(100);
                 try {
                     result[0] = findResult(requested, requestId).getContent();
                     break;
                 }catch (NullPointerException e){ }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return result[0];
+        if(result[0]  != null) return result[0];
+        return null;
     }
 
     private Message findResult(Message head, byte[] requestID){
